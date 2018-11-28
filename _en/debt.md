@@ -29,10 +29,9 @@ and we should clear some of before we go on to new topics.
 
 Because [reasons][bryan-setwd].
 
-## But...
+**But...**
 
-No.
-Use the [here package][here-package].
+No. Use the [here package][here-package].
 
 ## Formulas
 
@@ -94,6 +93,39 @@ lazy evaluation allows us to accomplish marvels.
 Used unwisely---well,
 there's no reason for us to dwell on that,
 particularly not after what happened to poor Higgins...
+
+## Factors
+
+Another feature of R that doesn't have an exact analog in Python is **factors**.
+In statistics, a factor is a categorical variable such as "flavor",
+which can be "vanilla", "chocolate", "strawberry", or "mustard".
+Factors can be represented as strings,
+but storing the same string many times wastes space and is inefficient
+(since comparing strings takes longer than comparing numbers).
+What R and other languages therefore do is store each string once
+and associate it with a numeric key,
+so that internally, "mustard" is the number 4 in the lookup table for "flavor",
+but is presented as "mustard" rather than 4.
+(Just to keep us on our toes,
+R allows factors to be either ordered or unordered.)
+
+While this is useful, it brings with it some problems:
+
+1.  On the statistical side,
+    it encourages people to put messy reality into tidy but misleading boxes.
+    For example, it's unfortunately still common for forms to require people to identify themselves
+    as either "male" or "female",
+    which is [scientifically](https://www.quora.com/Scientifically-how-many-sexes-genders-are-there)
+    [incorrect](https://www.joshuakennon.com/the-six-common-biological-sexes-in-humans/).
+    Similarly, census forms that ask questions about racial or ethnic identity often leave people scratching their heads,
+    since they don't fit into any of the categories on offer.
+2.  On the computational side,
+    some functions in R automatically convert strings to factors by default.
+    This makes sense when working with statistical data---in most cases,
+    a column in which the same strings are repeated many times is categorical---but
+    it is usually not the right choice in other situations.
+    This has surprised enough people the years that the tidyverse goes the other way
+    and only creates factors when asked to.
 
 ## Magic Names
 
@@ -239,12 +271,12 @@ first <- tribble(
   303,   404
 )
 tracemem(first)
-#> [1] "<0x7ff68b3b78c8>"
+#> [1] "<0x7fec51378188>"
 first$left[[1]] <- 999
-#> tracemem[0x7ff68b3b78c8 -> 0x7ff68b44e448]: eval eval withVisible withCallingHandlers doTryCatch tryCatchOne tryCatchList tryCatch try handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file knit .f map process main 
-#> tracemem[0x7ff68b44e448 -> 0x7ff68b44e3c8]: eval eval withVisible withCallingHandlers doTryCatch tryCatchOne tryCatchList tryCatch try handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file knit .f map process main 
-#> tracemem[0x7ff68b44e3c8 -> 0x7ff68b44e348]: $<-.data.frame $<- eval eval withVisible withCallingHandlers doTryCatch tryCatchOne tryCatchList tryCatch try handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file knit .f map process main 
-#> tracemem[0x7ff68b44e348 -> 0x7ff68b44e308]: $<-.data.frame $<- eval eval withVisible withCallingHandlers doTryCatch tryCatchOne tryCatchList tryCatch try handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file knit .f map process main
+#> tracemem[0x7fec51378188 -> 0x7fec51484848]: eval eval withVisible withCallingHandlers doTryCatch tryCatchOne tryCatchList tryCatch try handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file knit .f map process main 
+#> tracemem[0x7fec51484848 -> 0x7fec514847c8]: eval eval withVisible withCallingHandlers doTryCatch tryCatchOne tryCatchList tryCatch try handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file knit .f map process main 
+#> tracemem[0x7fec514847c8 -> 0x7fec51484748]: $<-.data.frame $<- eval eval withVisible withCallingHandlers doTryCatch tryCatchOne tryCatchList tryCatch try handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file knit .f map process main 
+#> tracemem[0x7fec51484748 -> 0x7fec51484708]: $<-.data.frame $<- eval eval withVisible withCallingHandlers doTryCatch tryCatchOne tryCatchList tryCatch try handle timing_fn evaluate_call <Anonymous> evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file knit .f map process main
 untracemem(first)
 ```
 
@@ -256,13 +288,13 @@ We can accomplish something a little more readable using `address`:
 ```r
 left <- first$left # alias
 cat("left column is initially at", address(left), "\n")
-#> left column is initially at 0x7ff68b44e408
+#> left column is initially at 0x7fec51484808
 first$left[[2]] <- 888
 cat("after modification, the original column is still at", address(left), "\n")
-#> after modification, the original column is still at 0x7ff68b44e408
+#> after modification, the original column is still at 0x7fec51484808
 temp <- first$left # another alias
 cat("but the first column of the tibble is at", address(temp), "\n")
-#> but the first column of the tibble is at 0x7ff68b872288
+#> but the first column of the tibble is at 0x7fec516a2f08
 ```
 
 (We need to use [aliases](../glossary/#alias) because `address(first$left)` doesn't work:
