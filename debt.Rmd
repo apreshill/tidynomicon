@@ -104,7 +104,7 @@ but is presented as "mustard" rather than 4.
 (Just to keep us on our toes,
 R allows factors to be either ordered or unordered.)
 
-While this is useful, it brings with it some problems:
+This is useful, but brings with it some problems:
 
 1.  On the statistical side,
     it encourages people to put messy reality into tidy but misleading boxes.
@@ -121,6 +121,9 @@ While this is useful, it brings with it some problems:
     it is usually not the right choice in other situations.
     This has surprised enough people the years that the tidyverse goes the other way
     and only creates factors when asked to.
+
+To learn more about how factors work and how to use them when analyzing categorical data,
+please see [this paper](https://peerj.com/preprints/3163/) by McNamara and Horton.
 
 ## Magic Names
 
