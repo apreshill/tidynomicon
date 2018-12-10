@@ -122,6 +122,72 @@ This is useful, but brings with it some problems:
     This has surprised enough people the years that the tidyverse goes the other way
     and only creates factors when asked to.
 
+Let's work through a small example.
+Suppose we've read a CSV file and wound up with this table:
+
+```{r}
+raw <- tribble(
+  ~person, ~flavor, ~ranking,
+  "Lhawang", "strawberry", 1.7,
+  "Lhawang", "chocolate",  2.5,
+  "Lhawang", "mustard",    0.2,
+  "Khadee",  "strawberry", 2.1,
+  "Khadee", "chocolate",   2.4,
+  "Khadee", "vanilla",     3.9,
+  "Haddad", "strawberry",  1.8,
+  "Haddad", "vanilla",     2.1
+)
+raw
+```
+
+Let's aggregate using flavor values so that we can check our factor-based aggregating later:
+
+```{r}
+raw %>% group_by(flavor) %>% summarize(number = n(), average = mean(ranking))
+```
+
+
+It probably doesn't make sense to turn the `person` column into factors,
+since names are actually character strings,
+but the `flavor` column is a good candidate:
+
+```{r}
+raw <- mutate_at(raw, vars(flavor), as.factor)
+raw
+```
+
+We can still aggregate as we did before:
+
+```{r}
+raw %>% group_by(flavor) %>% summarize(number = n(), average = mean(ranking))
+```
+
+We can also impose an ordering on the factor's elements:
+
+```{r}
+levels(raw$flavor) <- c("chocolate", "strawberry", "vanilla", "mustard")
+```
+
+This changes the order in which they are displayed after grouping:
+
+```{r}
+raw %>% group_by(flavor) %>% summarize(number = n(), average = mean(ranking))
+```
+
+But wait: the average values have also changed.
+For example, the average rating for `strawberry` is now `0.2` instead of `1.866667`.
+
+And also changes the order of bars in a bar chart:
+
+```{r}
+raw %>%
+  group_by(flavor) %>%
+  summarize(number = n(), average = mean(ranking)) %>%
+  ggplot() +
+  geom_col(mapping = aes(x = flavor, y = average))
+```
+
+
 To learn more about how factors work and how to use them when analyzing categorical data,
 please see [this paper](https://peerj.com/preprints/3163/) by McNamara and Horton.
 
